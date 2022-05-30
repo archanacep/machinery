@@ -362,9 +362,12 @@ func (server *Server) RegisterPeriodicTask(spec, name string, signature *tasks.S
 	}
 
 	f := func() {
+		log.ERROR.Printf("RegisterPeriodicTask.f() start: task name is: %s.", name)
+
 		//get lock
 		err := server.lock.LockWithRetries(utils.GetLockName(name, spec), schedule.Next(time.Now()).UnixNano()-1)
 		if err != nil {
+			log.ERROR.Printf("LockWithRetries failed. task name is: %s. error is %s", name, err.Error())
 			return
 		}
 
@@ -373,9 +376,12 @@ func (server *Server) RegisterPeriodicTask(spec, name string, signature *tasks.S
 		if err != nil {
 			log.ERROR.Printf("periodic task failed. task name is: %s. error is %s", name, err.Error())
 		}
+
+		log.ERROR.Printf("RegisterPeriodicTask.f() end: task name is: %s.", name)
 	}
 
 	_, err = server.scheduler.AddFunc(spec, f)
+	log.ERROR.Printf("RegisterPeriodicTask: task name is: %s.", name)
 	return err
 }
 
