@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/RichardKnop/machinery/v1/config"
+	"github.com/RichardKnop/machinery/v1/log"
 	"github.com/go-redis/redis/v8"
 )
 
@@ -55,7 +56,7 @@ func (r Lock) LockWithRetries(key string, unixTsToExpireNs int64) error {
 			//成功拿到锁，返回
 			return nil
 		}
-
+		log.ERROR.Printf("LockWithRetries: err=%v key=%v unixTsToExpireNs=%v i=%v", err, key, unixTsToExpireNs, i)
 		time.Sleep(r.interval)
 	}
 	return ErrRedisLockFailed
